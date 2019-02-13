@@ -23,8 +23,10 @@
 <script>
     import Chart from 'chart.js'
     import _ from "lodash";
+    import SyncClient from 'twilio-sync';
 
     export default {
+        props: ['token'],
         data() {
             return {
                 candidates: [],
@@ -66,7 +68,19 @@
             }
         },
         mounted() {
-            this.drawChart()
+            let token = this.token; // -> gets us the token
+            let syncClient = new SyncClient(token);
+
+            syncClient.on('connectionStateChanged', (state) => {
+              if (state === 'connected') {
+                  syncClient.stream('votes').then((stream) => {
+                      stream.on('messagePublished', (args) => {
+                        let candidates = args.message.value.payload.candidates.original.data
+                        this.drawChart(_.map(candidates, 'name'), _.map(candidates, 'votes_count'));
+                      });
+                  });
+              }
+            });
         },
         created() {
           axios.get('/candidates')

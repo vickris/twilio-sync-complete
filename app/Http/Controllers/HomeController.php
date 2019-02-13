@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Candidate;
+use App\Events\IncrementVotes;
 use Illuminate\Http\Request;
 use Twilio\Jwt\AccessToken;
 use Twilio\Jwt\Grants\SyncGrant;
@@ -22,7 +23,7 @@ class HomeController extends Controller
     // This function should be held in a more secure class in your code
     protected function getToken() {
         // Create yourself an identity for your token
-        $identity = "SuperUser123";
+        $identity = "Vickris";
         // Creates an access token, which we will then serialize and send to the client
         $token = new AccessToken(
             env('TWILIO_ACCOUNT_SID'),
@@ -46,12 +47,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('home', ['token' => $this->getToken()]);
     }
 
     public function incrementVotes(Candidate $candidate)
     {
         $candidate->increment('votes_count');
+        broadcast(new IncrementVotes($this->candidates()))->toOthers();
         return $this->candidates();
     }
 

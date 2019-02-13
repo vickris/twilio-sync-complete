@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.6.6"
     },
     "dependencies": {
-        "chart.js": "^2.7.3"
+        "chart.js": "^2.7.3",
+        "twilio-sync": "^0.9.1"
     }
 }

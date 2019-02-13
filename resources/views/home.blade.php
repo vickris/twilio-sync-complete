@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-<voting></voting>
+<voting :token="'{{ $token }}'"></voting>
 @endsection
