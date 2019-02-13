@@ -5,7 +5,9 @@
                 <div class="card card-default">
                     <div class="card-header">Votes</div>
                     <div class="candidates">
-                      <!-- Buttons to cast votes will go in here -->
+                        <ul>
+                            <li v-for="candidate in candidates"><button @click="incrementVotes(candidate.id)">{{ candidate.name }}</button></li>
+                        </ul>
                     </div>
 
                     <!-- Our focus right now -->
@@ -30,15 +32,15 @@
             }
         },
         methods: {
-            drawChart() {
+            drawChart(names, votes) {
               let ctx = document.getElementById("myChart");
               this.chart = new Chart(ctx, {
                   type: 'bar',
                   data: {
-                      labels: ['candidate 1', 'Candidate 2'],
+                      labels: names,
                       datasets: [{
                           label: '# of Votes',
-                          data: [5, 8],
+                          data: votes,
                           borderWidth: 1
                       }]
                   },
@@ -52,10 +54,28 @@
                     }
                   }
               });
+            },
+            incrementVotes(candidate_id) {
+              axios.post('/candidates/' + candidate_id, {})
+              .then((response) => {
+                let candidates = response.data.data
+                this.drawChart(_.map(candidates, 'name'), _.map(candidates, 'votes_count'))
+              }).catch((error) => {
+                  console.error(error)
+              })
             }
         },
-        created() {
+        mounted() {
             this.drawChart()
+        },
+        created() {
+          axios.get('/candidates')
+            .then((response) => {
+              this.candidates = response.data.data;
+              this.drawChart(_.map(this.candidates, 'name'), _.map(this.candidates, 'votes_count'))
+            }).catch((error) => {
+              console.error(error)
+            })
         }
     }
 </script>

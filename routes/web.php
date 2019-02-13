@@ -16,3 +16,6 @@ Route::get( '/', 'HomeController@index' );
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/candidates', 'HomeController@candidates');
+Route::post('/candidates/{candidate}', 'HomeController@incrementVotes');

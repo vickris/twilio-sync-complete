@@ -1820,6 +1820,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1830,15 +1832,15 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    drawChart: function drawChart() {
+    drawChart: function drawChart(names, votes) {
       var ctx = document.getElementById("myChart");
       this.chart = new chart_js__WEBPACK_IMPORTED_MODULE_0___default.a(ctx, {
         type: 'bar',
         data: {
-          labels: ['candidate 1', 'Candidate 2'],
+          labels: names,
           datasets: [{
             label: '# of Votes',
-            data: [5, 8],
+            data: votes,
             borderWidth: 1
           }]
         },
@@ -1852,10 +1854,32 @@ __webpack_require__.r(__webpack_exports__);
           }
         }
       });
+    },
+    incrementVotes: function incrementVotes(candidate_id) {
+      var _this = this;
+
+      axios.post('/candidates/' + candidate_id, {}).then(function (response) {
+        var candidates = response.data.data;
+
+        _this.drawChart(lodash__WEBPACK_IMPORTED_MODULE_1___default.a.map(candidates, 'name'), lodash__WEBPACK_IMPORTED_MODULE_1___default.a.map(candidates, 'votes_count'));
+      }).catch(function (error) {
+        console.error(error);
+      });
     }
   },
-  created: function created() {
+  mounted: function mounted() {
     this.drawChart();
+  },
+  created: function created() {
+    var _this2 = this;
+
+    axios.get('/candidates').then(function (response) {
+      _this2.candidates = response.data.data;
+
+      _this2.drawChart(lodash__WEBPACK_IMPORTED_MODULE_1___default.a.map(_this2.candidates, 'name'), lodash__WEBPACK_IMPORTED_MODULE_1___default.a.map(_this2.candidates, 'votes_count'));
+    }).catch(function (error) {
+      console.error(error);
+    });
   }
 });
 
@@ -69572,27 +69596,47 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row justify-content-center" }, [
+      _c("div", { staticClass: "col-md-8" }, [
+        _c("div", { staticClass: "card card-default" }, [
+          _c("div", { staticClass: "card-header" }, [_vm._v("Votes")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "candidates" }, [
+            _c(
+              "ul",
+              _vm._l(_vm.candidates, function(candidate) {
+                return _c("li", [
+                  _c(
+                    "button",
+                    {
+                      on: {
+                        click: function($event) {
+                          return _vm.incrementVotes(candidate.id)
+                        }
+                      }
+                    },
+                    [_vm._v(_vm._s(candidate.name))]
+                  )
+                ])
+              }),
+              0
+            )
+          ]),
+          _vm._v(" "),
+          _vm._m(0)
+        ])
+      ])
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row justify-content-center" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card card-default" }, [
-            _c("div", { staticClass: "card-header" }, [_vm._v("Votes")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "candidates" }),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _c("canvas", { attrs: { id: "myChart" } })
-            ])
-          ])
-        ])
-      ])
+    return _c("div", { staticClass: "card-body" }, [
+      _c("canvas", { attrs: { id: "myChart" } })
     ])
   }
 ]
